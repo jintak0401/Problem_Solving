@@ -1,3 +1,4 @@
+
 ans = [0 for i in range(21)]
 
 ans[1] = 0
