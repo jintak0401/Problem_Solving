@@ -19,3 +19,4 @@ for i in range(length):
     ans %= MOD
 
 print(ans % MOD)
+
