@@ -12,8 +12,8 @@ for _ in range(k):
     after[b] |= {a}
 
 for i in range(1, n + 1):
-    tmp_before = deepcopy(before[i])
-    tmp_after = deepcopy(after[i])
+    tmp_before = list(before[i])
+    tmp_after = list(after[i])
     for j in tmp_before:
         before[i] |= before[j]
         after[j] |= after[i]
