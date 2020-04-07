@@ -1,8 +1,10 @@
 num = int(input())
+
 if num == 1:
     print(2)
     print('1\n2')
     exit()
+
 arr = [[0 for _ in range(num)] for _ in range(2)]
 arr[0][0], arr[0][-1], arr[1][-1], arr[1][0] = 2 * num, 2 * num - 1, 2 * num - 2, 2 * num - 3
 
