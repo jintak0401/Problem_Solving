@@ -5,7 +5,6 @@ input = stdin.readline
 def solve(_from, _to):
     
     ret_val = 1
-
     q = deque([_from])
 
     while q:
