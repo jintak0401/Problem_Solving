@@ -1,8 +1,11 @@
 from sys import stdin
+from collections import defaultdict
 input = stdin.readline
 
+area = []
 
-def get_sum(arr):
+def set_area(arr):
+    global area
     lu = [[0] * len(arr) for _ in range(len(arr))]
     ld = [[0] * len(arr) for _ in range(len(arr))]
     ru = [[0] * len(arr) for _ in range(len(arr))]
@@ -15,20 +18,65 @@ def get_sum(arr):
             ru[i][-j-1] = ru[i-1][-j-1] + ru[i][-j] - ru[i-1][-j] + arr[i][-j-1]
             rd[-i-1][-j-1] = rd[-i][-j-1] + rd[-i-1][-j] - rd[-i][-j] + arr[-i-1][-j-1]
 
-    return lu, ld, ru, rd
+    area = [lu, ld, ru, rd]
+
+def get_area(pt1, pt2, direction):
+    if direction == 0:
+        return area[0][pt1[0]][pt1[1]] - area[0][pt1[0]][pt2[1] - 1] - area[0][pt2[0] - 1][pt1[1]] + area[0][pt2[0] - 1][pt2[1] - 1]
+    elif direction == 1:
+        return area[1][pt1[0]][pt1[1]] - area[1][pt1[0]][pt2[1] - 1] - area[1][pt2[0] + 1][pt1[1]] + area[1][pt2[0] + 1][pt2[1] - 1]
+    elif direction == 2:
+        return area[2][pt1[0]][pt1[1]] - area[2][pt1[0]][pt2[1] + 1] - area[2][pt2[0] - 1][pt1[1]] + area[2][pt2[0] - 1][pt2[1] + 1]
+    else:
+        return area[3][pt1[0]][pt1[1]] - area[3][pt1[0]][pt2[1] + 1] - area[3][pt2[0] + 1][pt1[1]] + area[3][pt2[0] + 1][pt2[1] + 1]
 
 def solve(arr):
    
-    lu, ld, ru, rd = get_sum(arr)
+    global area
+    set_area(arr)
     ans = 0
 
-    for i in range(1, len(arr)):
-        for j in range(1, len(arr[i])):
-            if 0 < i < len(arr) - 1 and j < len(arr) - 1 and lu[i][j] == rd[i+1][j+1]:
-                ans += 1
-            if i > 0 and 
+    for i in range(1, len(arr) - 1):
+        for j in range(1, len(arr[i]) - 1):
+            tmp_lu = defaultdict(int)
+            tmp_ld = defaultdict(int)
+            tmp_ru = defaultdict(int)
+            tmp_rd = defaultdict(int)
+            if i != len(arr) - 2 and j != len(arr) - 2:
+                for k in range(1, i + 1):
+                    for l in range(1, j + 1):
+                        tmp_lu[get_area((i, j), (k, l), 0)] += 1
+                for k in range(i + 1, len(arr) - 1):
+                    for l in range(j + 1, len(arr) - 1):
+                        tmp_rd[get_area((i+1, j+1), (k, l), 3)] += 1
+            if i != 1 and j != len(arr) - 2:
+                for k in range(len(arr) - 2, i - 1, -1):
+                    for l in range(1, j + 1):
+                        tmp_ld[get_area((i, j), (k, l), 1)] += 1
+                for k in range(i - 1, 0, - 1):
+                    for l in range(j + 1, len(arr) - 1):
+                        tmp_ru[get_area((i-1, j+1), (k, l), 2)] += 1
 
+            treat, control = [], [] # 실험군, 대조군
+            if len(tmp_lu) < len(tmp_rd):
+                treat.append(tmp_lu)
+                control.append(tmp_rd)
+            else:
+                treat.append(tmp_rd)
+                control.append(tmp_lu)
+            if len(tmp_ld) < len(tmp_ru):
+                treat.append(tmp_ld)
+                control.append(tmp_ru)
+            else:
+                treat.append(tmp_ru)
+                control.append(tmp_ld)
 
+            for k in range(2):
+                for key in treat[k].keys():
+                    if key in control[k]:
+                        ans += control[k][key] * treat[k][key]
+
+    return ans
 
 size = int(input())
 arr = [[0] * (size + 2)]
@@ -36,18 +84,4 @@ for _ in range(size):
     arr.append([0] + list(map(int, input().split())) + [0])
 arr.append([0] * (size + 2))
 
-print('----------------')
-for i in arr:
-    print(*i)
-
-lu, ld, ru, rd = get_sum(arr)
-
-tmp = [lu, ld, ru, rd]
-
-print('===============')
-for k in range(4):
-    for i in range(len(arr)):
-        for j in range(len(arr)):
-            print(tmp[k][i][j], end =' ')
-        print()
-    print('===================')
+print(solve(arr))
