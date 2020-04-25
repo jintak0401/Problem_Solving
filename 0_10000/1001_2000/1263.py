@@ -6,6 +6,7 @@ def solve():
     arr = [tuple(map(int, input().split())) for _ in range(N)]
     arr.sort(key = lambda x : x[1])
     ans = 10 ** 10
+    
     t = 0
     for i in range(N):
         t += arr[i][0]
