@@ -8,29 +8,27 @@ def solve():
     n = int(input())
     arr = list(map(int, input().split()))
     
-    asc = [arr[0]]
-    asc_len = [0 for _ in range(n)]
-    desc = [arr[-1]]
-    desc_len = [0 for _ in range(n)]
-    asc_len[0], desc_len[-1] = 1, 1
+    dp = [arr[0]]
+    ans = [0 for i in range(n)]
+    ans[0] += 1
+    ans[-1] += 1
 
     for i in range(1, n):
-        if asc[-1] < arr[i]:
-            asc.append(arr[i])
+        if dp[-1] < arr[i]:
+            dp.append(arr[i])
         else:
-            asc[bisect_left(asc, arr[i])] = arr[i]
-        if desc[-1] < arr[-i - 1]:
-            desc.append(arr[-i - 1])
-        else:
-            desc[bisect_left(desc, arr[-i - 1])] = arr[-i - 1]
+            dp[bisect_left(dp, arr[i])] = arr[i]
+        ans[i] += len(dp)
 
-        asc_len[i] = len(asc)
-        desc_len[-i - 1] = len(desc)
+    dp = [arr[-1]]
+    for i in range(n - 2, 0, -1):
+        if dp[-1] < arr[i]:
+            dp.append(arr[i])
+        else:
+            dp[bisect_left(dp, arr[i])] = arr[i]
+        ans[i] += len(dp)
     
-    ans = 0
-    for i in range(n):
-        ans = max(ans, asc_len[i] + desc_len[i] - 1)
-    print(ans)
+    print(max(ans) - 1)
     return
 
 solve()
